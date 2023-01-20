@@ -11,7 +11,7 @@ with open("./userdata.sh") as f:
 
 
 class CdkServerStack(Stack):
-    def __init__(self, scope: Construct, id: str, vpc=ec2.Vpc, ServerSG=ec2.SecurityGroup, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, vpc=ec2.Vpc, ServerSG=ec2.SecurityGroup, PrivateServerSG=ec2.SecurityGroup, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         # Instance Role and SSM Managed Policy
@@ -30,5 +30,44 @@ class CdkServerStack(Stack):
                                         virtualization=ec2.AmazonLinuxVirt.HVM),
                                     security_group=ServerSG,
                                     user_data=ec2.UserData.custom(user_data),
+                                    role=role,
+                                    )
+
+        self.server2 = ec2.Instance(self, "server2",
+                                    instance_name="server2",
+                                    instance_type=ec2.InstanceType("t2.micro"),
+                                    vpc=vpc,
+                                    vpc_subnets=ec2.SubnetSelection(
+                                          subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
+                                    machine_image=ec2.MachineImage.latest_amazon_linux(
+                                        virtualization=ec2.AmazonLinuxVirt.HVM),
+                                    security_group=ServerSG,
+                                    user_data=ec2.UserData.custom(user_data),
+                                    role=role,
+                                    )
+        self.server3 = ec2.Instance(self, "server3",
+                                    instance_name="server3",
+                                    instance_type=ec2.InstanceType("t2.micro"),
+                                    vpc=vpc,
+                                    vpc_subnets=ec2.SubnetSelection(
+                                          subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
+                                    machine_image=ec2.MachineImage.latest_amazon_linux(
+                                        virtualization=ec2.AmazonLinuxVirt.HVM),
+                                    security_group=PrivateServerSG,
+                                    user_data=ec2.UserData.custom(user_data),
+                                    role=role,
+                                    )
+        self.server4 = ec2.Instance(self, "server4",
+                                    instance_name="server4",
+                                    instance_type=ec2.InstanceType(
+                                          "t2.micro"),
+                                    vpc=vpc,
+                                    vpc_subnets=ec2.SubnetSelection(
+                                        subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
+                                    machine_image=ec2.MachineImage.latest_amazon_linux(
+                                        virtualization=ec2.AmazonLinuxVirt.HVM),
+                                    security_group=PrivateServerSG,
+                                    user_data=ec2.UserData.custom(
+                                        user_data),
                                     role=role,
                                     )

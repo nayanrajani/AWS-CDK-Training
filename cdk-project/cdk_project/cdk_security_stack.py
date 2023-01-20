@@ -31,3 +31,38 @@ class CdkSecurityStack(Stack):
             ec2.Port.tcp(80),
             'Allow only from LoadBalancer on 80'
         )
+
+        self.privatealbsg = ec2.SecurityGroup(self, 'PrivateEc2LBSG',
+                                              security_group_name='PrivateEc2LBSG',
+                                              vpc=vpc,
+                                              description='Private Ec2 ALB',
+                                              allow_all_outbound=True
+                                              )
+        self.privatealbsg.connections.allow_from(
+            self.ServerSG,
+            ec2.Port.tcp(80),
+            'allow from server1 server 2 SG on port 80'
+        )
+
+        self.PrivateServerSG = ec2.SecurityGroup(self, 'PrivateServerSG',
+                                                 security_group_name='PrivateServerSG',
+                                                 vpc=vpc,
+                                                 allow_all_outbound=True
+                                                 )
+        self.PrivateServerSG.connections.allow_from(
+            self.privatealbsg,
+            ec2.Port.tcp(80),
+            'Allow only from Private LoadBalancer on 80'
+        )
+
+        self.RDSSG = ec2.SecurityGroup(self, 'RDS-SG',
+                                       security_group_name='RDS-SG',
+                                       vpc=vpc,
+                                       description='SG for DB in isolated subnet',
+                                       allow_all_outbound=True
+                                       )
+        self.RDSSG.connections.allow_from(
+            self.PrivateServerSG,
+            ec2.Port.tcp(3306),
+            'Allow only from Private Servers'
+        )
