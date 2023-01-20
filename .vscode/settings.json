@@ -1,0 +1,6 @@
+{
+  "prettier.withNodeModules": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "python.analysis.typeCheckingMode": "basic"
+}
