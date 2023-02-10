@@ -17,8 +17,11 @@ app = cdk.App()
 # CdkTrainingStack(app, "cdk-training")
 vpcstack = CdkNetworkStack(app, "cdknetworkstack")
 securitystack = CdkSecurityStack(app, "cdksecuritystack", vpc=vpcstack.vpc)
+securitystack.add_dependency(vpcstack)
+
 serverstack = CdkServerStack(app, "cdkserverstack", vpc=vpcstack.vpc,
                              ServerSG=securitystack.ServerSG, PrivateServerSG=securitystack.PrivateServerSG)
+serverstack.add_dependency(securitystack)
 lbstack = CdkALBStack(app, "cdkalbstack", vpc=vpcstack.vpc,
                       serveralbsg=securitystack.serveralbsg, privatealbsg=securitystack.privatealbsg, server1=serverstack.server1, server2=serverstack.server2, server3=serverstack.server3, server4=serverstack.server4)
 dbstack = CdkDBStack(app, "cdkdbstack", vpc=vpcstack.vpc,
